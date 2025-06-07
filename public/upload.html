@@ -1,0 +1,48 @@
+<!-- public/upload.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Video - Guru</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Upload Video Pembelajaran</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <label for="title">Judul Video:</label><br />
+    <input type="text" id="title" name="title" required /><br /><br />
+
+    <label for="description">Deskripsi:</label><br />
+    <textarea id="description" name="description" required></textarea><br /><br />
+
+    <label for="video">Pilih File Video:</label><br />
+    <input type="file" id="video" name="video" accept="video/*" required /><br /><br />
+
+    <button type="submit">Upload</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      const response = await fetch("/api/videos/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      const msg = document.getElementById("message");
+      if (response.ok) {
+        msg.textContent = "Video berhasil diunggah!";
+        e.target.reset();
+      } else {
+        msg.textContent = "Gagal mengunggah: " + result.error;
+      }
+    });
+  </script>
+</body>
+</html>
