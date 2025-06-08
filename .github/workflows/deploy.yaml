@@ -1,0 +1,34 @@
+name: Deploy ke VPS
+
+on:
+  push:
+    branches:
+      - main  # atau ganti dengan nama branch kamu
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout kode dari GitHub
+      uses: actions/checkout@v3
+
+    - name: Upload file ke VPS via SCP
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: "."  # Folder yang dikirim
+        target: "/home/ubuntu/projekUasCloud"  # Lokasi di server
+
+    - name: SSH ke server dan restart Node.js
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /home/ubuntu/projekUasCloud
+          npm install
+          pm2 restart server.js || pm2 start server.js --name pinteryuk
